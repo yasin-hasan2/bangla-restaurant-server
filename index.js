@@ -32,11 +32,12 @@ async function run() {
 
 
 
-    
+    const menuCollection = client.db("banglaDB").collection("menu");
 
-
-
-
+    app.get('/menu', async(req, res) => {
+      const result = await menuCollection.find().toArray();
+      res.send(result)
+    })
 
 
 
@@ -45,7 +46,7 @@ async function run() {
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
