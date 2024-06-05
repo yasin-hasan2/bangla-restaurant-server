@@ -32,9 +32,22 @@ async function run() {
 
 
 
+    const userCollection = client.db("banglaDB").collection("users");
     const menuCollection = client.db("banglaDB").collection("menu");
     const reviewCollection = client.db("banglaDB").collection("reviews");
     const cartCollection = client.db("banglaDB").collection("carts");
+
+
+    // users related api
+    app.post('/users', async (req, res) => {
+      const user = req.body;
+      const result = await userCollection.insertOne(user);
+      res.send(result);
+    })
+
+
+
+
 
     app.get('/menu', async(req, res) => {
       const result = await menuCollection.find().toArray();
