@@ -30,7 +30,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
 
 
@@ -292,6 +292,57 @@ async function run() {
         revenue
 
       })
+    })
+
+    // order status
+    /**
+     * ----------------------------
+     * NON-Efficient way
+     * ----------------------------
+     * 1. load all the payments
+     * 2. for every menuitemIds (which is an ), go find the item find menu collection
+     * 3. for every item in the menu collection that you found from all fo the documents
+     */
+
+    // using aggregate pipeline 
+    app.get('/order-stats',  async (req, res) => {
+      const result = await paymentCollection.aggregate([
+        {
+          $unwind: '$menuItemIds',
+        },
+        {
+          $lookup: {
+            from: 'menu',
+            localField: 'menuItemIds',
+            foreignField: '_id',
+            as: 'menuItems'
+          }
+        },
+        {
+          $unwind: '$menuItems'
+        },
+        {
+          $group: {
+            _id: '$menuItems.category',
+            quantity:{$sum: 1},
+            revenue: {$sum: '$menuItems.price'}
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            category: '$_id',
+            quantity: '$quantity',
+            revenue: '$revenue'
+          }
+        }
+
+      ]).toArray();
+
+      res.send(result);
+
+
+
     })
 
 
